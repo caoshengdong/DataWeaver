@@ -132,8 +132,23 @@ func (c *Connector) getDriverName() string {
 	}
 }
 
+// QueryResult holds the result of a query execution with ordered columns
+type QueryResult struct {
+	Columns []string                 // Column names in order as returned by the database
+	Data    []map[string]interface{} // Row data
+}
+
 // ExecuteQuery executes a query with named parameters and returns the results as maps
 func (c *Connector) ExecuteQuery(query string, params map[string]interface{}) ([]map[string]interface{}, error) {
+	result, err := c.ExecuteQueryWithColumns(query, params)
+	if err != nil {
+		return nil, err
+	}
+	return result.Data, nil
+}
+
+// ExecuteQueryWithColumns executes a query and returns results with ordered column names
+func (c *Connector) ExecuteQueryWithColumns(query string, params map[string]interface{}) (*QueryResult, error) {
 	if c.db == nil {
 		return nil, fmt.Errorf("database not connected")
 	}
@@ -147,7 +162,7 @@ func (c *Connector) ExecuteQuery(query string, params map[string]interface{}) ([
 	}
 	defer rows.Close()
 
-	return c.rowsToMaps(rows)
+	return c.rowsToQueryResult(rows)
 }
 
 // convertNamedParams converts :paramName syntax to database-specific parameter format
@@ -208,6 +223,15 @@ func (c *Connector) convertNamedParams(query string, params map[string]interface
 
 // rowsToMaps converts sql.Rows to a slice of maps
 func (c *Connector) rowsToMaps(rows *sql.Rows) ([]map[string]interface{}, error) {
+	result, err := c.rowsToQueryResult(rows)
+	if err != nil {
+		return nil, err
+	}
+	return result.Data, nil
+}
+
+// rowsToQueryResult converts sql.Rows to QueryResult with ordered columns
+func (c *Connector) rowsToQueryResult(rows *sql.Rows) (*QueryResult, error) {
 	columns, err := rows.Columns()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get columns: %w", err)
@@ -243,7 +267,10 @@ func (c *Connector) rowsToMaps(rows *sql.Rows) ([]map[string]interface{}, error)
 		return nil, fmt.Errorf("row iteration error: %w", err)
 	}
 
-	return results, nil
+	return &QueryResult{
+		Columns: columns,
+		Data:    results,
+	}, nil
 }
 
 // GetTableSchema returns the schema for a specific table

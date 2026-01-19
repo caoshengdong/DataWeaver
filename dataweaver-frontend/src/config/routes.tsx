@@ -2,7 +2,7 @@ import { createBrowserRouter } from 'react-router-dom'
 import { MainLayout } from '@/components/layout'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
-import { Dashboard, DataSources, Queries, Jobs, Settings, NotFound, Login, Register } from '@/pages'
+import { Dashboard, DataSources, Queries, Tools, Jobs, Settings, NotFound, Login, Register } from '@/pages'
 
 export const router = createBrowserRouter([
   {
@@ -27,6 +27,7 @@ export const router = createBrowserRouter([
       { index: true, element: <Dashboard /> },
       { path: 'datasources', element: <DataSources /> },
       { path: 'queries', element: <Queries /> },
+      { path: 'tools', element: <Tools /> },
       { path: 'jobs', element: <Jobs /> },
       { path: 'settings', element: <Settings /> },
       { path: '*', element: <NotFound /> },

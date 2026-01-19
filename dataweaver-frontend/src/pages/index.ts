@@ -1,6 +1,7 @@
 export { Dashboard } from './Dashboard'
 export { DataSources } from './DataSources'
 export { Queries } from './Queries'
+export { Tools } from './Tools'
 export { Jobs } from './Jobs'
 export { Settings } from './Settings'
 export { NotFound } from './NotFound'

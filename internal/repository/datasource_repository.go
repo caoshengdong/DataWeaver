@@ -145,9 +145,8 @@ func (r *dataSourceRepository) Search(userID uint, keyword string, page, size in
 // HasAssociatedQueries checks if a datasource has associated queries
 func (r *dataSourceRepository) HasAssociatedQueries(id string) (bool, error) {
 	var count int64
-	// Note: This assumes Query model has DataSourceID field that references DataSourceV2
-	// If using the original Query model with uint DataSourceID, this needs adjustment
-	if err := r.db.Model(&model.Query{}).Where("data_source_id = ?", id).Count(&count).Error; err != nil {
+	// Check QueryV2 model which uses UUID data_source_id
+	if err := r.db.Model(&model.QueryV2{}).Where("data_source_id = ?", id).Count(&count).Error; err != nil {
 		return false, fmt.Errorf("failed to count associated queries: %w", err)
 	}
 	return count > 0, nil

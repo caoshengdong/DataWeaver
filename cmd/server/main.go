@@ -85,7 +85,10 @@ func main() {
 		&model.User{},
 		&model.DataSourceV2{},
 		&model.Query{},
+		&model.QueryV2{},
+		&model.QueryExecution{},
 		&model.Tool{},
+		&model.ToolV2{},
 		&model.MCPServer{},
 	); err != nil {
 		logger.Fatal("Failed to migrate database", zap.Error(err))

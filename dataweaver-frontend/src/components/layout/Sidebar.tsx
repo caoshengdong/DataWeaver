@@ -5,6 +5,7 @@ import { useI18n } from '@/i18n/I18nContext'
 import {
   Database,
   Search,
+  Wrench,
   PlayCircle,
   Settings,
   Home,
@@ -22,6 +23,7 @@ export function Sidebar() {
     { icon: Home, label: t.nav.dashboard, path: '/' },
     { icon: Database, label: t.nav.dataSources, path: '/datasources' },
     { icon: Search, label: t.nav.queries, path: '/queries' },
+    { icon: Wrench, label: t.nav.tools, path: '/tools' },
     { icon: PlayCircle, label: t.nav.jobs, path: '/jobs' },
     { icon: Settings, label: t.nav.settings, path: '/settings' },
   ]

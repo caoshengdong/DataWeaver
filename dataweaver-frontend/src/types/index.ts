@@ -78,11 +78,76 @@ export interface ColumnInfo {
 }
 
 // Query types
+export type QueryParameterType = 'string' | 'number' | 'boolean' | 'date'
+
+export interface QueryParameter {
+  id: string
+  name: string
+  type: QueryParameterType
+  required: boolean
+  defaultValue?: string
+  description?: string
+}
+
 export interface Query extends BaseEntity {
   name: string
   dataSourceId: string
   sql: string
   description?: string
+  parameters: QueryParameter[]
+}
+
+export interface QueryFormData {
+  name: string
+  dataSourceId: string
+  sql: string
+  description?: string
+  parameters: QueryParameter[]
+}
+
+export interface QueryExecuteParams {
+  queryId: string
+  parameters: Record<string, unknown>
+}
+
+export interface QueryResult {
+  columns: string[]
+  rows: Record<string, unknown>[]
+  rowCount: number
+  executionTime: number
+}
+
+// Backend API response format for query execution
+export interface QueryExecuteApiResponse {
+  columns: string[]
+  data: Record<string, unknown>[]
+  row_count: number
+  execution_time_ms: number
+}
+
+export interface QueryHistory {
+  id: string
+  queryId: string
+  queryName: string
+  parameters: Record<string, unknown>
+  status: 'success' | 'error'
+  rowCount?: number
+  executionTime?: number
+  errorMessage?: string
+  createdAt: string
+}
+
+// Backend API response format for query history
+export interface QueryHistoryApiResponse {
+  id: string
+  query_id: string
+  query_name?: string
+  parameters: Record<string, unknown>
+  row_count: number
+  execution_time_ms: number
+  status: string
+  error_message?: string
+  created_at: string
 }
 
 // Job types
@@ -92,4 +157,82 @@ export interface Job extends BaseEntity {
   schedule?: string
   lastRunAt?: string
   nextRunAt?: string
+}
+
+// Tool types
+export type ToolParameterType = 'string' | 'number' | 'integer' | 'boolean' | 'date' | 'datetime'
+
+export interface ToolParameter {
+  name: string
+  type: ToolParameterType
+  required: boolean
+  default?: unknown
+  description: string
+  format?: string
+}
+
+export interface Tool extends BaseEntity {
+  name: string
+  displayName: string
+  description: string
+  queryId: string
+  parameters: ToolParameter[]
+  outputSchema: Record<string, unknown>
+  version: number
+  mcpServerId?: string
+  status: 'active' | 'inactive'
+  query?: {
+    id: string
+    name: string
+    description: string
+  }
+}
+
+export interface ToolFormData {
+  name: string
+  displayName: string
+  description: string
+  queryId: string
+  parameters: ToolParameter[]
+  outputSchema: Record<string, unknown>
+}
+
+export interface ToolTestResult {
+  success: boolean
+  message: string
+  executionTimeMs: number
+  rowCount: number
+  data?: Record<string, unknown>[]
+  columns?: string[]
+}
+
+// Backend API response formats for Tool
+export interface ToolApiResponse {
+  id: string
+  user_id: number
+  name: string
+  display_name: string
+  description: string
+  query_id: string
+  parameters: ToolParameter[]
+  output_schema: Record<string, unknown>
+  version: number
+  mcp_server_id?: string
+  status: string
+  created_at: string
+  updated_at: string
+  query?: {
+    id: string
+    name: string
+    description: string
+  }
+}
+
+export interface ToolTestApiResponse {
+  success: boolean
+  message: string
+  execution_time_ms: number
+  row_count: number
+  data?: Record<string, unknown>[]
+  columns?: string[]
 }

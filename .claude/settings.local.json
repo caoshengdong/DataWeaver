@@ -25,7 +25,15 @@
       "Bash(lsof:*)",
       "Bash(xargs kill -9)",
       "Bash(curl:*)",
-      "Bash(TOKEN=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3Njg0MDUyNjksImlhdCI6MTc2ODMxODg2OSwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciJ9.bQrjwGSBml5V2YRiDmd77s6N8QRIKoL8JtV6CuppiPU\")"
+      "Bash(TOKEN=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3Njg0MDUyNjksImlhdCI6MTc2ODMxODg2OSwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciJ9.bQrjwGSBml5V2YRiDmd77s6N8QRIKoL8JtV6CuppiPU\")",
+      "Bash(go build:*)",
+      "Bash(go mod tidy:*)",
+      "Bash(go mod edit:*)",
+      "Bash(timeout 10 go run:*)",
+      "Bash(go list:*)",
+      "Bash(git checkout:*)",
+      "Bash(find:*)",
+      "Bash(npm ls:*)"
     ]
   }
 }

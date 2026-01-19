@@ -9,6 +9,8 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/yourusername/dataweaver/internal/api/auth"
 	"github.com/yourusername/dataweaver/internal/api/datasource"
+	"github.com/yourusername/dataweaver/internal/api/query"
+	"github.com/yourusername/dataweaver/internal/api/tool"
 	"github.com/yourusername/dataweaver/internal/database"
 	"github.com/yourusername/dataweaver/internal/middleware"
 	"github.com/yourusername/dataweaver/internal/repository"
@@ -38,14 +40,20 @@ func SetupRouter(mode string) *gin.Engine {
 		// Initialize repositories
 		userRepo := repository.NewUserRepository(database.DB)
 		dsRepo := repository.NewDataSourceRepository(database.DB)
+		queryRepo := repository.NewQueryRepository(database.DB)
+		toolRepo := repository.NewToolRepository(database.DB)
 
 		// Initialize services
 		authSvc := service.NewAuthService(userRepo)
 		dsSvc := service.NewDataSourceService(dsRepo)
+		querySvc := service.NewQueryService(queryRepo, dsRepo)
+		toolSvc := service.NewToolService(toolRepo, queryRepo, dsRepo)
 
 		// Initialize handlers
 		authHandler := auth.NewHandler(authSvc)
 		dsHandler := datasource.NewHandler(dsSvc)
+		queryHandler := query.NewHandler(querySvc)
+		toolHandler := tool.NewHandler(toolSvc)
 
 		// Public routes (no authentication required)
 		public := v1.Group("")
@@ -81,24 +89,33 @@ func SetupRouter(mode string) *gin.Engine {
 			}
 
 			// Query routes
-			query := protected.Group("/queries")
+			queries := protected.Group("/queries")
 			{
-				query.GET("", placeholder("list queries"))
-				query.POST("", placeholder("create query"))
-				query.GET("/:id", placeholder("get query"))
-				query.PUT("/:id", placeholder("update query"))
-				query.DELETE("/:id", placeholder("delete query"))
-				query.POST("/:id/execute", placeholder("execute query"))
+				queries.GET("", queryHandler.List)
+				queries.POST("", queryHandler.Create)
+				queries.POST("/validate", queryHandler.ValidateSQL)
+				queries.GET("/history", queryHandler.GetHistory) // Must be before /:id
+				queries.GET("/:id", queryHandler.Get)
+				queries.PUT("/:id", queryHandler.Update)
+				queries.DELETE("/:id", queryHandler.Delete)
+				queries.POST("/:id/execute", queryHandler.Execute)
+				queries.POST("/:id/validate", queryHandler.Validate)
+				queries.GET("/:id/parameters", queryHandler.GetParameters)
 			}
 
 			// Tool routes
-			tool := protected.Group("/tools")
+			tools := protected.Group("/tools")
 			{
-				tool.GET("", placeholder("list tools"))
-				tool.POST("", placeholder("create tool"))
-				tool.GET("/:id", placeholder("get tool"))
-				tool.PUT("/:id", placeholder("update tool"))
-				tool.DELETE("/:id", placeholder("delete tool"))
+				tools.GET("", toolHandler.List)
+				tools.POST("", toolHandler.Create)
+				tools.GET("/export", toolHandler.ExportAll) // Must be before /:id
+				tools.POST("/from-query/:query_id", toolHandler.CreateFromQuery)
+				tools.GET("/:id", toolHandler.Get)
+				tools.PUT("/:id", toolHandler.Update)
+				tools.DELETE("/:id", toolHandler.Delete)
+				tools.POST("/:id/test", toolHandler.TestTool)
+				tools.GET("/:id/export", toolHandler.Export)
+				tools.POST("/:id/generate-description", toolHandler.GenerateDescription)
 			}
 
 			// MCP Server routes
