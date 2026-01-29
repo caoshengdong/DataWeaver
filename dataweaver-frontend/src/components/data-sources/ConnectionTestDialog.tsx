@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { useI18n } from '@/i18n/I18nContext'
 import type { TestConnectionResult } from '@/types'
 
 interface ConnectionTestDialogProps {
@@ -26,13 +27,15 @@ export function ConnectionTestDialog({
   isLoading,
   onViewTables,
 }: ConnectionTestDialogProps) {
+  const { t } = useI18n()
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>测试数据库连接</DialogTitle>
+          <DialogTitle>{t.dataSources.connectionTest.title}</DialogTitle>
           <DialogDescription>
-            正在验证数据库连接配置...
+            {t.dataSources.connectionTest.subtitle}
           </DialogDescription>
         </DialogHeader>
 
@@ -40,7 +43,7 @@ export function ConnectionTestDialog({
           {isLoading && (
             <div className="flex flex-col items-center justify-center space-y-4">
               <Loader2 className="h-12 w-12 animate-spin text-primary" />
-              <p className="text-sm text-muted-foreground">连接中...</p>
+              <p className="text-sm text-muted-foreground">{t.dataSources.connectionTest.testing}</p>
             </div>
           )}
 
@@ -50,25 +53,25 @@ export function ConnectionTestDialog({
               {result.success && (
                 <>
                   <div className="flex items-center justify-center">
-                    <div className="rounded-full bg-green-100 p-3">
-                      <CheckCircle2 className="h-12 w-12 text-green-600" />
+                    <div className="rounded-full bg-green-100 p-3 dark:bg-green-900/30">
+                      <CheckCircle2 className="h-12 w-12 text-green-600 dark:text-green-400" />
                     </div>
                   </div>
                   <div className="text-center space-y-2">
-                    <h3 className="font-semibold text-lg">连接成功！</h3>
+                    <h3 className="font-semibold text-lg">{t.dataSources.connectionTest.success}</h3>
                     <p className="text-sm text-muted-foreground">
                       {result.message}
                     </p>
                     {result.latency !== undefined && (
                       <p className="text-xs text-muted-foreground">
-                        延迟: {result.latency}ms
+                        {t.dataSources.connectionTest.latency}: {result.latency}ms
                       </p>
                     )}
                   </div>
                   <Alert>
                     <Database className="h-4 w-4" />
                     <AlertDescription>
-                      数据库连接配置正确，可以正常使用。
+                      {t.dataSources.connectionTest.configCorrect}
                     </AlertDescription>
                   </Alert>
                 </>
@@ -78,14 +81,14 @@ export function ConnectionTestDialog({
               {!result.success && (
                 <>
                   <div className="flex items-center justify-center">
-                    <div className="rounded-full bg-red-100 p-3">
-                      <XCircle className="h-12 w-12 text-red-600" />
+                    <div className="rounded-full bg-red-100 p-3 dark:bg-red-900/30">
+                      <XCircle className="h-12 w-12 text-red-600 dark:text-red-400" />
                     </div>
                   </div>
                   <div className="text-center space-y-2">
-                    <h3 className="font-semibold text-lg">连接失败</h3>
+                    <h3 className="font-semibold text-lg">{t.dataSources.connectionTest.failed}</h3>
                     <p className="text-sm text-muted-foreground">
-                      请检查连接配置并重试
+                      {t.dataSources.connectionTest.failedDesc}
                     </p>
                   </div>
                   <Alert variant="destructive">
@@ -111,7 +114,7 @@ export function ConnectionTestDialog({
               className="w-full sm:w-auto"
             >
               <Database className="mr-2 h-4 w-4" />
-              查看表列表
+              {t.dataSources.actions.viewTables}
             </Button>
           )}
           <Button
@@ -119,7 +122,7 @@ export function ConnectionTestDialog({
             disabled={isLoading}
             className="w-full sm:w-auto"
           >
-            {result?.success ? '完成' : '关闭'}
+            {result?.success ? t.dataSources.connectionTest.done : t.dataSources.connectionTest.close}
           </Button>
         </DialogFooter>
       </DialogContent>

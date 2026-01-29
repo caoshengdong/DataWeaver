@@ -7,6 +7,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
+import { useI18n } from '@/i18n/I18nContext'
 import type { DataSource } from '@/types'
 
 interface DataSourceCardProps {
@@ -24,21 +25,18 @@ const DB_ICONS: Record<string, React.ReactNode> = {
   oracle: <Database className="h-4 w-4 text-red-600" />,
 }
 
-const STATUS_CONFIG = {
+const STATUS_COLORS = {
   active: {
-    color: 'bg-green-500',
-    text: '活跃',
-    textColor: 'text-green-700',
+    dot: 'bg-green-500',
+    text: 'text-green-700 dark:text-green-400',
   },
   inactive: {
-    color: 'bg-gray-400',
-    text: '禁用',
-    textColor: 'text-gray-600',
+    dot: 'bg-gray-400',
+    text: 'text-gray-600 dark:text-gray-400',
   },
   error: {
-    color: 'bg-red-500',
-    text: '错误',
-    textColor: 'text-red-700',
+    dot: 'bg-red-500',
+    text: 'text-red-700 dark:text-red-400',
   },
 }
 
@@ -49,25 +47,39 @@ export function DataSourceCard({
   onEdit,
   onDelete,
 }: DataSourceCardProps) {
-  const status = STATUS_CONFIG[dataSource.status]
+  const { t } = useI18n()
+  const statusColors = STATUS_COLORS[dataSource.status]
+  const statusText = t.dataSources.status[dataSource.status]
 
   return (
     <div
       className={cn(
-        'group relative rounded-lg border bg-card p-4 cursor-pointer transition-all',
-        'hover:shadow-md hover:border-primary/50',
-        isSelected && 'border-primary shadow-md ring-2 ring-primary/20'
+        'group relative rounded-lg border bg-card p-4 cursor-pointer',
+        'transition-all duration-200 ease-out',
+        'hover:shadow-sm hover:border-border/80',
+        'active:scale-[0.99] motion-reduce:active:scale-100',
+        isSelected
+          ? 'border-primary/60 bg-primary/[0.04] dark:bg-primary/[0.06] shadow-sm'
+          : 'hover:bg-muted/40'
       )}
       onClick={onSelect}
     >
+      {/* Left accent bar for selected state */}
+      {isSelected && (
+        <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full bg-primary" />
+      )}
+
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-3 flex-1 min-w-0">
           {/* Icon */}
-          <div className="mt-0.5">{DB_ICONS[dataSource.type]}</div>
+          <div className="mt-0.5" aria-hidden="true">{DB_ICONS[dataSource.type]}</div>
 
           {/* Content */}
           <div className="flex-1 min-w-0">
-            <h3 className="font-medium text-sm truncate">{dataSource.name}</h3>
+            <h3 className={cn(
+              "font-medium text-sm truncate",
+              isSelected && "text-primary"
+            )}>{dataSource.name}</h3>
             <p className="text-xs text-muted-foreground mt-0.5 capitalize">
               {dataSource.type}
             </p>
@@ -83,9 +95,10 @@ export function DataSourceCard({
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+              className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-150"
+              aria-label={t.common.moreOptions}
             >
-              <MoreVertical className="h-4 w-4" />
+              <MoreVertical className="h-4 w-4" aria-hidden="true" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -96,7 +109,7 @@ export function DataSourceCard({
               }}
             >
               <Pencil className="mr-2 h-4 w-4" />
-              编辑
+              {t.common.edit}
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={(e) => {
@@ -106,7 +119,7 @@ export function DataSourceCard({
               className="text-destructive focus:text-destructive"
             >
               <Trash2 className="mr-2 h-4 w-4" />
-              删除
+              {t.common.delete}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -114,9 +127,9 @@ export function DataSourceCard({
 
       {/* Status Indicator */}
       <div className="flex items-center gap-2 mt-3">
-        <div className={cn('h-2 w-2 rounded-full', status.color)} />
-        <span className={cn('text-xs font-medium', status.textColor)}>
-          {status.text}
+        <div className={cn('h-2 w-2 rounded-full', statusColors.dot)} />
+        <span className={cn('text-xs font-medium', statusColors.text)}>
+          {statusText}
         </span>
       </div>
 

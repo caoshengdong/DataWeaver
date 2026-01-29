@@ -329,13 +329,18 @@ export interface McpServerApiResponse {
   api_key?: string
   tool_ids: string[]
   config: {
-    timeout: number
-    rate_limit: number
-    log_level: string
-    enable_cache: boolean
+    // Backend uses these field names
+    timeout_seconds?: number
+    rate_limit_per_min?: number
+    log_level?: string
+    enable_caching?: boolean
+    // Frontend expected names (for compatibility)
+    timeout?: number
+    rate_limit?: number
+    enable_cache?: boolean
     cache_expiration_ms?: number
   }
-  access_control: {
+  access_control?: {
     api_key_required: boolean
     allowed_origins: string[]
     ip_whitelist: string[]
@@ -376,6 +381,43 @@ export interface McpServerCallLogApiResponse {
   response_time: number
   parameters?: Record<string, unknown>
   error_message?: string
+}
+
+// LLM Provider types
+export type LLMProviderType =
+  | 'openai'
+  | 'anthropic'
+  | 'google'
+  | 'azure'
+  | 'deepseek'
+  | 'qwen'
+  | 'zhipu'
+  | 'moonshot'
+  | 'minimax'
+  | 'baichuan'
+  | 'yi'
+
+export interface LLMProviderConfig {
+  id: LLMProviderType
+  name: string
+  defaultBaseUrl: string
+  modelListEndpoint: string
+  authType: 'bearer' | 'query-param' | 'custom-header'
+  authHeader?: string
+  hardcodedModels?: LLMModel[]
+}
+
+export interface LLMModel {
+  id: string
+  name: string
+}
+
+export interface ModelConfiguration {
+  provider: LLMProviderType
+  apiKey: string
+  baseUrl: string
+  model: string
+  isValidated: boolean
 }
 
 // MCP Config Export format

@@ -152,7 +152,7 @@ export function Tools() {
   const isSaving = createTool.isPending || updateTool.isPending
 
   return (
-    <div className="h-[calc(100vh-4rem)] flex">
+    <div className="h-[calc(100vh-4rem)] flex -m-6">
       {/* Left Column - Tool List (30%) */}
       <div className="w-[30%] min-w-[280px] max-w-[400px] border-r bg-muted/30">
         <ToolList

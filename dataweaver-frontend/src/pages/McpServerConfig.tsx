@@ -77,6 +77,11 @@ export function McpServerConfigPage() {
     if (!id) return
     setTestResult(null)
     try {
+      // Save changes first if any
+      if (hasChanges) {
+        await updateServer.mutateAsync({ id, data: formData })
+        setHasChanges(false)
+      }
       const result = await testServer.mutateAsync(id)
       setTestResult(result)
     } catch {
@@ -102,7 +107,7 @@ export function McpServerConfigPage() {
 
   if (isLoadingServer) {
     return (
-      <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
+      <div className="flex items-center justify-center h-[calc(100vh-4rem)] -m-6">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     )
@@ -110,7 +115,7 @@ export function McpServerConfigPage() {
 
   if (!server) {
     return (
-      <div className="flex flex-col items-center justify-center h-[calc(100vh-4rem)] text-muted-foreground">
+      <div className="flex flex-col items-center justify-center h-[calc(100vh-4rem)] -m-6 text-muted-foreground">
         <h2 className="text-xl font-medium mb-2">{t.mcpServers?.notFound || 'Server not found'}</h2>
         <Button variant="outline" onClick={() => navigate('/mcp-servers')}>
           <ArrowLeft className="h-4 w-4 mr-2" />
@@ -123,9 +128,9 @@ export function McpServerConfigPage() {
   const availableTools = Array.isArray(tools) ? tools : []
 
   return (
-    <div className="h-[calc(100vh-4rem)] flex flex-col">
+    <div className="h-[calc(100vh-4rem)] flex flex-col -m-6">
       {/* Header */}
-      <div className="border-b px-6 py-4 flex items-center justify-between bg-background">
+      <div className="border-b px-6 py-4 flex items-center justify-between bg-background flex-shrink-0">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={() => navigate('/mcp-servers')}>
             <ArrowLeft className="h-5 w-5" />
@@ -283,7 +288,7 @@ export function McpServerConfigPage() {
       </div>
 
       {/* Footer Actions */}
-      <div className="border-t px-6 py-4 flex items-center justify-between bg-background">
+      <div className="border-t px-6 py-4 flex items-center justify-between bg-background flex-shrink-0">
         <div className="flex items-center gap-2">
           <Button
             variant="outline"

@@ -7,13 +7,18 @@ import {
   Search,
   Wrench,
   Server,
-  PlayCircle,
   Settings,
   Home,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 
 export function Sidebar() {
   const location = useLocation()
@@ -26,7 +31,6 @@ export function Sidebar() {
     { icon: Search, label: t.nav.queries, path: '/queries' },
     { icon: Wrench, label: t.nav.tools, path: '/tools' },
     { icon: Server, label: t.nav.mcpServers, path: '/mcp-servers' },
-    { icon: PlayCircle, label: t.nav.jobs, path: '/jobs' },
     { icon: Settings, label: t.nav.settings, path: '/settings' },
   ]
 
@@ -46,34 +50,56 @@ export function Sidebar() {
           size="icon"
           onClick={toggleSidebar}
           className={cn(!sidebarOpen && 'mx-auto')}
+          aria-label={sidebarOpen ? t.common.collapseSidebar : t.common.expandSidebar}
         >
-          {sidebarOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
+          {sidebarOpen ? <ChevronLeft size={20} aria-hidden="true" /> : <ChevronRight size={20} aria-hidden="true" />}
         </Button>
       </div>
 
-      <nav className="space-y-1 p-2">
-        {navItems.map((item) => {
-          const isActive = item.path === '/'
-            ? location.pathname === '/'
-            : location.pathname.startsWith(item.path)
-          return (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
-                isActive
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
-                !sidebarOpen && 'justify-center px-2'
-              )}
-            >
-              <item.icon size={20} />
-              {sidebarOpen && <span>{item.label}</span>}
-            </Link>
-          )
-        })}
-      </nav>
+      <TooltipProvider delayDuration={0}>
+        <nav className="space-y-1 p-2">
+          {navItems.map((item) => {
+            const isActive = item.path === '/'
+              ? location.pathname === '/'
+              : location.pathname.startsWith(item.path)
+
+            const linkContent = (
+              <Link
+                to={item.path}
+                className={cn(
+                  'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all duration-200',
+                  isActive
+                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
+                  !sidebarOpen && 'justify-center px-2',
+                  // Active indicator bar
+                  isActive && 'relative before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:h-6 before:w-1 before:rounded-r-full before:bg-primary-foreground before:opacity-80',
+                  !sidebarOpen && isActive && 'before:hidden'
+                )}
+              >
+                <item.icon size={20} className="shrink-0" aria-hidden="true" />
+                {sidebarOpen && <span>{item.label}</span>}
+              </Link>
+            )
+
+            // Show tooltip only when sidebar is collapsed
+            if (!sidebarOpen) {
+              return (
+                <Tooltip key={item.path}>
+                  <TooltipTrigger asChild>
+                    {linkContent}
+                  </TooltipTrigger>
+                  <TooltipContent side="right" className="font-medium">
+                    {item.label}
+                  </TooltipContent>
+                </Tooltip>
+              )
+            }
+
+            return <div key={item.path}>{linkContent}</div>
+          })}
+        </nav>
+      </TooltipProvider>
     </aside>
   )
 }

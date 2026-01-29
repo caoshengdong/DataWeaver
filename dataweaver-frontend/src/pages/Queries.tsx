@@ -86,9 +86,9 @@ export function Queries() {
   }, [])
 
   return (
-    <div className="h-[calc(100vh-4rem)] flex">
+    <div className="h-[calc(100vh-4rem)] flex -m-6">
       {/* Left Sidebar - Query List */}
-      <div className="w-64 border-r flex flex-col bg-muted/30">
+      <div className="w-72 min-w-[240px] border-r flex flex-col bg-muted/30">
         {/* Header */}
         <div className="p-4 border-b space-y-3">
           <div className="flex items-center justify-between">
@@ -194,6 +194,7 @@ export function Queries() {
 
         {(viewMode === 'create' || viewMode === 'edit') && (
           <QueryBuilder
+            key={selectedQueryId || 'new'}
             queryId={selectedQueryId || undefined}
             onQuerySaved={handleQuerySaved}
           />

@@ -211,8 +211,8 @@ export function QueryBuilder({ queryId, onQuerySaved }: QueryBuilderProps) {
 
   return (
     <div className="h-full flex">
-      {/* Left Sidebar - Schema Explorer (20%) */}
-      <div className="w-72 min-w-[240px] border-r bg-muted/30 flex-shrink-0 resize-x overflow-auto" style={{ maxWidth: '400px' }}>
+      {/* Left Sidebar - Schema Explorer */}
+      <div className="w-80 min-w-[280px] max-w-[480px] border-r bg-muted/30 flex-shrink-0">
         <SchemaExplorer
           dataSources={dataSources}
           selectedDataSourceId={selectedDataSourceId}
@@ -226,8 +226,8 @@ export function QueryBuilder({ queryId, onQuerySaved }: QueryBuilderProps) {
 
       {/* Middle - SQL Editor (50%) */}
       <div className="flex-1 min-w-[400px] flex flex-col overflow-hidden">
-        {/* Query Name & Description */}
-        <div className="p-4 border-b space-y-3 flex-shrink-0">
+        {/* Top Toolbar - Query Name, Save, Format, Validate */}
+        <div className="p-4 border-b space-y-3 flex-shrink-0 bg-background">
           <div className="flex items-center gap-3">
             <div className="flex-1">
               <Input
@@ -237,86 +237,85 @@ export function QueryBuilder({ queryId, onQuerySaved }: QueryBuilderProps) {
                 className="h-10 text-lg font-medium"
               />
             </div>
-            <Button
-              onClick={handleSave}
-              disabled={isSaving || !queryName.trim() || !selectedDataSourceId || !sql.trim()}
-            >
-              {isSaving ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Save className="h-4 w-4" />
-              )}
-              {t.common?.save || 'Save'}
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleFormat}
+                disabled={formatSql.isPending}
+              >
+                {formatSql.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Code2 className="h-4 w-4" />
+                )}
+                {t.queries?.actions?.format || 'Format'}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleValidate}
+                disabled={validateSql.isPending || !selectedDataSourceId}
+              >
+                {validateSql.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : validationResult?.valid ? (
+                  <CheckCircle className="h-4 w-4 text-green-500" />
+                ) : validationResult?.valid === false ? (
+                  <AlertCircle className="h-4 w-4 text-destructive" />
+                ) : (
+                  <CheckCircle className="h-4 w-4" />
+                )}
+                {t.queries?.actions?.validate || 'Validate'}
+              </Button>
+              <Button
+                onClick={handleSave}
+                disabled={isSaving || !queryName.trim() || !selectedDataSourceId || !sql.trim()}
+              >
+                {isSaving ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Save className="h-4 w-4" />
+                )}
+                {t.common?.save || 'Save'}
+              </Button>
+            </div>
           </div>
-          <Textarea
-            placeholder={t.queries?.form?.descriptionPlaceholder || 'Description (optional)'}
-            value={queryDescription}
-            onChange={(e) => setQueryDescription(e.target.value)}
-            className="min-h-[60px] resize-none"
-          />
+          <div className="flex items-center gap-3">
+            <Textarea
+              placeholder={t.queries?.form?.descriptionPlaceholder || 'Description (optional)'}
+              value={queryDescription}
+              onChange={(e) => setQueryDescription(e.target.value)}
+              className="min-h-[40px] max-h-[60px] resize-none flex-1"
+              rows={1}
+            />
+            {extractedParams.length > 0 && (
+              <div className="text-xs text-muted-foreground whitespace-nowrap">
+                {t.queries?.editor?.paramsDetected || 'Parameters:'} <span className="font-mono">{extractedParams.join(', ')}</span>
+              </div>
+            )}
+          </div>
+          {validationResult && !validationResult.valid && validationResult.message && (
+            <div className="text-xs text-destructive bg-destructive/10 px-3 py-2 rounded-md">
+              {validationResult.message}
+            </div>
+          )}
         </div>
 
-        {/* SQL Editor */}
-        <div className="flex-1 p-4 flex flex-col min-h-0">
-          <div className="flex-1 min-h-[300px]">
+        {/* SQL Editor - Scrollable Area */}
+        <div className="flex-1 p-4 overflow-auto min-h-0">
+          <div className="h-full min-h-[300px]">
             <SQLEditor
               value={sql}
               onChange={setSql}
               parameters={parameters}
             />
           </div>
-
-          {/* Bottom Toolbar */}
-          <div className="flex items-center gap-2 mt-3 pt-3 border-t flex-shrink-0">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleFormat}
-              disabled={formatSql.isPending}
-            >
-              {formatSql.isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Code2 className="h-4 w-4" />
-              )}
-              {t.queries?.actions?.format || 'Format'}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleValidate}
-              disabled={validateSql.isPending || !selectedDataSourceId}
-            >
-              {validateSql.isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : validationResult?.valid ? (
-                <CheckCircle className="h-4 w-4 text-green-500" />
-              ) : validationResult?.valid === false ? (
-                <AlertCircle className="h-4 w-4 text-destructive" />
-              ) : (
-                <CheckCircle className="h-4 w-4" />
-              )}
-              {t.queries?.actions?.validate || 'Validate'}
-            </Button>
-
-            {validationResult && !validationResult.valid && validationResult.message && (
-              <span className="text-xs text-destructive ml-2">{validationResult.message}</span>
-            )}
-
-            <div className="ml-auto text-xs text-muted-foreground">
-              {extractedParams.length > 0 && (
-                <span>
-                  {t.queries?.editor?.paramsDetected || 'Parameters:'} {extractedParams.join(', ')}
-                </span>
-              )}
-            </div>
-          </div>
         </div>
       </div>
 
-      {/* Right Panel - Tabs (30%) */}
-      <div className="w-[30%] min-w-[300px] max-w-[400px] border-l flex flex-col">
+      {/* Right Panel - Tabs */}
+      <div className="w-[35%] min-w-[360px] max-w-[600px] border-l flex flex-col">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
           <TabsList className="w-full justify-start rounded-none border-b bg-transparent h-12 px-2">
             <TabsTrigger value="params" className="data-[state=active]:bg-muted">

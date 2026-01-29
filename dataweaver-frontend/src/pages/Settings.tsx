@@ -2,40 +2,42 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { ModelSettings } from '@/components/settings/ModelSettings'
 import { useAppStore } from '@/stores/useAppStore'
+import { useI18n } from '@/i18n/I18nContext'
 
 export function Settings() {
+  const { t } = useI18n()
   const { theme, setTheme } = useAppStore()
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Settings</h1>
+      <h1 className="text-3xl font-bold">{t.settings.title}</h1>
 
       <Tabs defaultValue="general" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="general">General</TabsTrigger>
-          <TabsTrigger value="appearance">Appearance</TabsTrigger>
-          <TabsTrigger value="api">API</TabsTrigger>
+          <TabsTrigger value="general">{t.settings.tabs.general}</TabsTrigger>
+          <TabsTrigger value="appearance">{t.settings.tabs.appearance}</TabsTrigger>
+          <TabsTrigger value="models">{t.settings.tabs.models}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="general" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Profile</CardTitle>
-              <CardDescription>Manage your account settings</CardDescription>
+              <CardTitle>{t.settings.profile.title}</CardTitle>
+              <CardDescription>{t.settings.profile.description}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-2">
-                <Label htmlFor="name">Name</Label>
-                <Input id="name" placeholder="Your name" />
+                <Label htmlFor="name">{t.settings.profile.name}</Label>
+                <Input id="name" placeholder={t.settings.profile.namePlaceholder} />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="your@email.com" />
+                <Label htmlFor="email">{t.settings.profile.email}</Label>
+                <Input id="email" type="email" placeholder={t.settings.profile.emailPlaceholder} autoComplete="email" />
               </div>
-              <Button>Save Changes</Button>
+              <Button>{t.settings.profile.saveChanges}</Button>
             </CardContent>
           </Card>
         </TabsContent>
@@ -43,8 +45,8 @@ export function Settings() {
         <TabsContent value="appearance" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Theme</CardTitle>
-              <CardDescription>Customize the appearance of the application</CardDescription>
+              <CardTitle>{t.settings.theme.title}</CardTitle>
+              <CardDescription>{t.settings.theme.description}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex gap-2">
@@ -55,7 +57,7 @@ export function Settings() {
                     document.documentElement.classList.remove('dark')
                   }}
                 >
-                  Light
+                  {t.settings.theme.light}
                 </Button>
                 <Button
                   variant={theme === 'dark' ? 'default' : 'outline'}
@@ -64,38 +66,21 @@ export function Settings() {
                     document.documentElement.classList.add('dark')
                   }}
                 >
-                  Dark
+                  {t.settings.theme.dark}
                 </Button>
                 <Button
                   variant={theme === 'system' ? 'default' : 'outline'}
                   onClick={() => setTheme('system')}
                 >
-                  System
+                  {t.settings.theme.system}
                 </Button>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="api" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>API Configuration</CardTitle>
-              <CardDescription>Configure API settings and keys</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid gap-2">
-                <Label htmlFor="api-url">API Base URL</Label>
-                <Input id="api-url" placeholder="http://localhost:8080/api" />
-              </div>
-              <Separator />
-              <div className="grid gap-2">
-                <Label htmlFor="api-key">API Key</Label>
-                <Input id="api-key" type="password" placeholder="Enter your API key" />
-              </div>
-              <Button>Save Configuration</Button>
-            </CardContent>
-          </Card>
+        <TabsContent value="models" className="space-y-4">
+          <ModelSettings />
         </TabsContent>
       </Tabs>
     </div>

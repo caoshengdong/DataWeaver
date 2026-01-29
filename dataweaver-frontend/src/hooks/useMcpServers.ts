@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { mcpServersApi } from '@/api/mcpServers'
-import type { McpServerFormData } from '@/types'
+import type { McpServer, McpServerFormData } from '@/types'
 import { toast } from 'sonner'
 
 // Query key factory
@@ -27,14 +27,35 @@ export function useMcpServers() {
 
 // Get a single MCP server
 export function useMcpServer(id: string | undefined) {
+  const queryClient = useQueryClient()
+
   return useQuery({
     queryKey: id ? mcpServerKeys.detail(id) : ['mcpServers', 'none'],
     queryFn: async () => {
       if (!id) return null
-      const response = await mcpServersApi.get(id)
-      return response.data.data
+      try {
+        const response = await mcpServersApi.get(id)
+        return response.data.data
+      } catch (error) {
+        // If API fails, try to get from list cache
+        const cachedList = queryClient.getQueryData<McpServer[]>(mcpServerKeys.lists())
+        if (cachedList) {
+          const cachedServer = cachedList.find(s => s.id === id)
+          if (cachedServer) {
+            return cachedServer
+          }
+        }
+        throw error
+      }
     },
     enabled: !!id,
+    // Use initialData from list cache for faster loading
+    initialData: () => {
+      const cachedList = queryClient.getQueryData<McpServer[]>(mcpServerKeys.lists())
+      return cachedList?.find(s => s.id === id)
+    },
+    // Mark stale immediately so we still try to fetch fresh data
+    initialDataUpdatedAt: 0,
   })
 }
 

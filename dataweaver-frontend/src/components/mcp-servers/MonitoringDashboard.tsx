@@ -55,6 +55,15 @@ export function MonitoringDashboard({ stats, logs, isLoading }: MonitoringDashbo
     )
   }
 
+  // Provide default values for potentially undefined fields
+  const totalCalls = stats.totalCalls ?? 0
+  const callsToday = stats.callsToday ?? 0
+  const successRate = stats.successRate ?? 0
+  const averageResponseTime = stats.averageResponseTime ?? 0
+  const topTools = stats.topTools ?? []
+  const callsTrend = stats.callsTrend ?? []
+  const responseTimeDistribution = stats.responseTimeDistribution ?? []
+
   return (
     <div className="space-y-6">
       {/* Key Metrics */}
@@ -67,9 +76,9 @@ export function MonitoringDashboard({ stats, logs, isLoading }: MonitoringDashbo
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalCalls.toLocaleString()}</div>
+            <div className="text-2xl font-bold">{totalCalls.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
-              {stats.callsToday.toLocaleString()} {t.mcpServers?.monitoring?.today || 'today'}
+              {callsToday.toLocaleString()} {t.mcpServers?.monitoring?.today || 'today'}
             </p>
           </CardContent>
         </Card>
@@ -83,12 +92,12 @@ export function MonitoringDashboard({ stats, logs, isLoading }: MonitoringDashbo
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {(stats.successRate * 100).toFixed(1)}%
+              {(successRate * 100).toFixed(1)}%
             </div>
             <p className="text-xs text-muted-foreground">
-              {stats.successRate >= 0.95 ? (
+              {successRate >= 0.95 ? (
                 <span className="text-green-600">{t.mcpServers?.monitoring?.excellent || 'Excellent'}</span>
-              ) : stats.successRate >= 0.9 ? (
+              ) : successRate >= 0.9 ? (
                 <span className="text-yellow-600">{t.mcpServers?.monitoring?.good || 'Good'}</span>
               ) : (
                 <span className="text-red-600">{t.mcpServers?.monitoring?.needsAttention || 'Needs attention'}</span>
@@ -105,11 +114,11 @@ export function MonitoringDashboard({ stats, logs, isLoading }: MonitoringDashbo
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.averageResponseTime.toFixed(0)}ms</div>
+            <div className="text-2xl font-bold">{averageResponseTime.toFixed(0)}ms</div>
             <p className="text-xs text-muted-foreground">
-              {stats.averageResponseTime < 100 ? (
+              {averageResponseTime < 100 ? (
                 <span className="text-green-600">{t.mcpServers?.monitoring?.fast || 'Fast'}</span>
-              ) : stats.averageResponseTime < 500 ? (
+              ) : averageResponseTime < 500 ? (
                 <span className="text-yellow-600">{t.mcpServers?.monitoring?.normal || 'Normal'}</span>
               ) : (
                 <span className="text-red-600">{t.mcpServers?.monitoring?.slow || 'Slow'}</span>
@@ -127,10 +136,10 @@ export function MonitoringDashboard({ stats, logs, isLoading }: MonitoringDashbo
           </CardHeader>
           <CardContent>
             <div className="text-lg font-bold truncate">
-              {stats.topTools[0]?.toolName || '-'}
+              {topTools[0]?.toolName || '-'}
             </div>
             <p className="text-xs text-muted-foreground">
-              {stats.topTools[0]?.calls.toLocaleString() || 0} {t.mcpServers?.monitoring?.calls || 'calls'}
+              {(topTools[0]?.calls ?? 0).toLocaleString()} {t.mcpServers?.monitoring?.calls || 'calls'}
             </p>
           </CardContent>
         </Card>
@@ -150,9 +159,9 @@ export function MonitoringDashboard({ stats, logs, isLoading }: MonitoringDashbo
           </CardHeader>
           <CardContent>
             <div className="h-[300px]">
-              {stats.callsTrend.length > 0 ? (
+              {callsTrend.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={stats.callsTrend}>
+                  <LineChart data={callsTrend}>
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                     <XAxis
                       dataKey="date"
@@ -219,9 +228,9 @@ export function MonitoringDashboard({ stats, logs, isLoading }: MonitoringDashbo
           </CardHeader>
           <CardContent>
             <div className="h-[300px]">
-              {stats.topTools.length > 0 ? (
+              {topTools.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={stats.topTools} layout="vertical">
+                  <BarChart data={topTools} layout="vertical">
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                     <XAxis type="number" fontSize={12} tickLine={false} axisLine={false} />
                     <YAxis
@@ -267,11 +276,11 @@ export function MonitoringDashboard({ stats, logs, isLoading }: MonitoringDashbo
           </CardHeader>
           <CardContent>
             <div className="h-[200px]">
-              {stats.responseTimeDistribution.length > 0 ? (
+              {responseTimeDistribution.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
-                      data={stats.responseTimeDistribution}
+                      data={responseTimeDistribution}
                       dataKey="count"
                       nameKey="range"
                       cx="50%"
@@ -280,7 +289,7 @@ export function MonitoringDashboard({ stats, logs, isLoading }: MonitoringDashbo
                       label={({ name, percent }) => `${name}: ${((percent ?? 0) * 100).toFixed(0)}%`}
                       labelLine={false}
                     >
-                      {stats.responseTimeDistribution.map((_, index) => (
+                      {responseTimeDistribution.map((_, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>

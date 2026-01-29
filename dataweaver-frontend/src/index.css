@@ -67,3 +67,100 @@ body {
   color: var(--color-foreground);
   font-feature-settings: "rlig" 1, "calt" 1;
 }
+
+/* Smooth scrolling with reduced motion support */
+html {
+  scroll-behavior: smooth;
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Enhanced focus states for accessibility */
+:focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 2px;
+}
+
+/* Interactive elements base styles */
+.interactive {
+  cursor: pointer;
+  transition: transform 200ms ease-out, opacity 200ms ease-out;
+}
+
+.interactive:hover {
+  transform: translateY(-1px);
+}
+
+.interactive:active {
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .interactive:hover,
+  .interactive:active {
+    transform: none;
+  }
+}
+
+/* Clickable card styles */
+.card-interactive {
+  cursor: pointer;
+  transition: box-shadow 200ms ease-out, border-color 200ms ease-out, transform 200ms ease-out;
+}
+
+.card-interactive:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: var(--color-primary);
+}
+
+.card-interactive:active {
+  transform: scale(0.99);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-interactive:hover {
+    transform: none;
+  }
+  .card-interactive:active {
+    transform: none;
+  }
+}
+
+/* Table row hover for clickable rows */
+.table-row-clickable {
+  cursor: pointer;
+  transition: background-color 150ms ease-out;
+}
+
+.table-row-clickable:hover {
+  background-color: var(--color-muted);
+}
+
+/* Smooth opacity transitions for reveal-on-hover elements */
+.reveal-on-hover {
+  opacity: 0;
+  transition: opacity 150ms ease-out;
+}
+
+.group:hover .reveal-on-hover,
+.group:focus-within .reveal-on-hover {
+  opacity: 1;
+}

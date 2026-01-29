@@ -84,12 +84,13 @@ function TableTreeItem({ table, onTableClick, onColumnClick }: TableTreeItemProp
   }, [table, onColumnClick])
 
   const hasColumns = table.columns && table.columns.length > 0
+  const fullTableName = table.schema ? `${table.schema}.${table.name}` : table.name
 
   return (
     <div>
       <div
         className={cn(
-          "flex items-center gap-1 py-1.5 px-2 rounded-md cursor-pointer hover:bg-muted/50 group",
+          "flex items-center gap-1.5 py-2 px-2 rounded-md cursor-pointer hover:bg-muted/50 group transition-colors",
           "text-sm"
         )}
         onClick={handleToggle}
@@ -101,47 +102,49 @@ function TableTreeItem({ table, onTableClick, onColumnClick }: TableTreeItemProp
             <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
           )
         ) : (
-          <span className="w-4" />
+          <span className="w-4 shrink-0" />
         )}
-        <TableIcon className="h-4 w-4 text-muted-foreground shrink-0" />
-        <span
-          className="truncate flex-1 group-hover:text-primary"
+        <TableIcon className="h-4 w-4 text-blue-500 shrink-0" />
+        <div
+          className="flex-1 min-w-0 group-hover:text-primary cursor-pointer"
           onClick={(e) => {
             e.stopPropagation()
             handleTableClick()
           }}
-          title={`${table.schema ? `${table.schema}.` : ''}${table.name}`}
+          title={fullTableName}
         >
-          {table.name}
-        </span>
-        {table.schema && (
-          <span className="text-xs text-muted-foreground shrink-0">
-            {table.schema}
-          </span>
-        )}
+          <div className="font-medium break-all leading-tight">
+            {table.name}
+          </div>
+          {table.schema && (
+            <div className="text-xs text-muted-foreground">
+              {table.schema}
+            </div>
+          )}
+        </div>
       </div>
 
       {expanded && hasColumns && (
-        <div className="ml-5 border-l pl-2 space-y-0.5">
+        <div className="ml-5 border-l border-border/50 pl-2 space-y-0.5 py-1">
           {table.columns!.map((column) => (
             <div
               key={column.name}
               className={cn(
-                "flex items-center gap-2 py-1 px-2 rounded-md cursor-pointer hover:bg-muted/50",
-                "text-xs"
+                "flex items-center gap-2 py-1.5 px-2 rounded-md cursor-pointer hover:bg-muted/50 transition-colors",
+                "text-xs group/col"
               )}
               onClick={() => handleColumnClick(column)}
               title={`${column.name} (${column.type})${column.nullable ? ' - nullable' : ''}`}
             >
               {column.isPrimaryKey ? (
-                <Key className="h-3 w-3 text-yellow-500 shrink-0" />
+                <Key className="h-3 w-3 text-amber-500 shrink-0" />
               ) : (
                 <span className="text-muted-foreground shrink-0">
                   {getColumnTypeIcon(column.type)}
                 </span>
               )}
-              <span className="truncate flex-1">{column.name}</span>
-              <span className="text-muted-foreground shrink-0 uppercase text-[10px]">
+              <span className="flex-1 min-w-0 break-all group-hover/col:text-primary">{column.name}</span>
+              <span className="text-muted-foreground shrink-0 uppercase text-[10px] font-mono bg-muted px-1 py-0.5 rounded">
                 {column.type}
               </span>
             </div>

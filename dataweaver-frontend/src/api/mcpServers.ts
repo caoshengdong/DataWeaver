@@ -15,6 +15,7 @@ import type {
 
 // Transform backend API response to frontend format
 function fromApiFormat(apiData: McpServerApiResponse): McpServer {
+  const config = apiData.config || {}
   return {
     id: apiData.id,
     name: apiData.name,
@@ -25,11 +26,12 @@ function fromApiFormat(apiData: McpServerApiResponse): McpServer {
     apiKey: apiData.api_key,
     toolIds: apiData.tool_ids || [],
     config: {
-      timeout: apiData.config?.timeout || 30,
-      rateLimit: apiData.config?.rate_limit || 60,
-      logLevel: (apiData.config?.log_level || 'info') as McpServer['config']['logLevel'],
-      enableCache: apiData.config?.enable_cache ?? false,
-      cacheExpirationMs: apiData.config?.cache_expiration_ms,
+      // Handle both backend naming (timeout_seconds) and frontend naming (timeout)
+      timeout: config.timeout_seconds ?? config.timeout ?? 30,
+      rateLimit: config.rate_limit_per_min ?? config.rate_limit ?? 60,
+      logLevel: (config.log_level || 'info') as McpServer['config']['logLevel'],
+      enableCache: config.enable_caching ?? config.enable_cache ?? false,
+      cacheExpirationMs: config.cache_expiration_ms,
     },
     accessControl: {
       apiKeyRequired: apiData.access_control?.api_key_required ?? true,
@@ -69,17 +71,13 @@ function toApiFormat(data: McpServerFormData | Partial<McpServerFormData>) {
     description: data.description,
     tool_ids: data.toolIds,
     config: data.config ? {
-      timeout: data.config.timeout,
-      rate_limit: data.config.rateLimit,
+      // Use backend field names
+      timeout_seconds: data.config.timeout,
+      rate_limit_per_min: data.config.rateLimit,
       log_level: data.config.logLevel,
-      enable_cache: data.config.enableCache,
-      cache_expiration_ms: data.config.cacheExpirationMs,
+      enable_caching: data.config.enableCache,
     } : undefined,
-    access_control: data.accessControl ? {
-      api_key_required: data.accessControl.apiKeyRequired,
-      allowed_origins: data.accessControl.allowedOrigins,
-      ip_whitelist: data.accessControl.ipWhitelist,
-    } : undefined,
+    // Note: access_control is not supported by backend yet
   }
 }
 
@@ -192,8 +190,41 @@ export const mcpServersApi = {
 
   // Test an MCP server configuration
   test: async (id: string) => {
-    const response = await apiClient.post<ApiResponse<{ success: boolean; message: string; latency?: number }>>(`/v1/mcp-servers/${id}/test`)
-    return response.data.data
+    const startTime = Date.now()
+    try {
+      const response = await apiClient.post<ApiResponse<{ success: boolean; message: string; latency?: number }>>(`/v1/mcp-servers/${id}/test`)
+      return response.data.data
+    } catch (error) {
+      const err = error as { response?: { status?: number } }
+      // If backend endpoint not implemented (404), perform local validation
+      if (err.response?.status === 404) {
+        // Fetch server config to validate locally
+        const serverResponse = await apiClient.get<ApiResponse<McpServerApiResponse>>(`/v1/mcp-servers/${id}`)
+        const server = fromApiFormat(serverResponse.data.data)
+        const latency = Date.now() - startTime
+
+        // Validate configuration
+        const errors: string[] = []
+        if (!server.name?.trim()) {
+          errors.push('Server name is required')
+        }
+        if (!server.toolIds || server.toolIds.length === 0) {
+          errors.push('At least one tool must be selected')
+        }
+        if (server.config.timeout < 1 || server.config.timeout > 300) {
+          errors.push('Timeout must be between 1 and 300 seconds')
+        }
+        if (server.config.rateLimit < 1) {
+          errors.push('Rate limit must be at least 1 request per minute')
+        }
+
+        if (errors.length > 0) {
+          return { success: false, message: errors.join('; '), latency }
+        }
+        return { success: true, message: 'Configuration is valid', latency }
+      }
+      throw error
+    }
   },
 
   // Get MCP server statistics

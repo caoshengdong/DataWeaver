@@ -12,6 +12,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useI18n } from '@/i18n/I18nContext'
 import type { TableInfo } from '@/types'
 
 interface TableBrowserProps {
@@ -21,6 +22,7 @@ interface TableBrowserProps {
 }
 
 export function TableBrowser({ tables, isLoading, error }: TableBrowserProps) {
+  const { t } = useI18n()
   const [searchQuery, setSearchQuery] = useState('')
 
   // Filter tables based on search query
@@ -49,7 +51,7 @@ export function TableBrowser({ tables, isLoading, error }: TableBrowserProps) {
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <Database className="h-5 w-5" />
-            表列表
+            {t.dataSources.tables.title}
             {!isLoading && tables.length > 0 && (
               <span className="text-sm font-normal text-muted-foreground">
                 ({tables.length})
@@ -61,7 +63,7 @@ export function TableBrowser({ tables, isLoading, error }: TableBrowserProps) {
         <div className="relative mt-4">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="搜索表名..."
+            placeholder={t.dataSources.tables.searchPlaceholder}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9"
@@ -88,7 +90,7 @@ export function TableBrowser({ tables, isLoading, error }: TableBrowserProps) {
         {error && (
           <Alert variant="destructive">
             <AlertDescription>
-              加载表列表失败: {error.message}
+              {t.dataSources.messages.loadError}: {error.message}
             </AlertDescription>
           </Alert>
         )}
@@ -97,9 +99,9 @@ export function TableBrowser({ tables, isLoading, error }: TableBrowserProps) {
         {!isLoading && !error && tables.length === 0 && (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <Database className="h-12 w-12 text-muted-foreground/50 mb-4" />
-            <h3 className="font-semibold mb-2">没有找到表</h3>
+            <h3 className="font-semibold mb-2">{t.dataSources.tables.noTables}</h3>
             <p className="text-sm text-muted-foreground">
-              此数据源中没有可访问的表
+              {t.dataSources.tables.noTablesDesc}
             </p>
           </div>
         )}
@@ -108,9 +110,9 @@ export function TableBrowser({ tables, isLoading, error }: TableBrowserProps) {
         {!isLoading && !error && tables.length > 0 && filteredTables.length === 0 && (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <Search className="h-12 w-12 text-muted-foreground/50 mb-4" />
-            <h3 className="font-semibold mb-2">没有匹配的结果</h3>
+            <h3 className="font-semibold mb-2">{t.dataSources.noResults}</h3>
             <p className="text-sm text-muted-foreground">
-              尝试使用不同的搜索关键词
+              {t.dataSources.noResultsDesc}
             </p>
           </div>
         )}
@@ -122,8 +124,8 @@ export function TableBrowser({ tables, isLoading, error }: TableBrowserProps) {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-12"></TableHead>
-                  <TableHead>表名</TableHead>
-                  <TableHead className="text-right w-24">行数</TableHead>
+                  <TableHead>{t.dataSources.tables.tableName}</TableHead>
+                  <TableHead className="text-right w-24">{t.dataSources.tables.rowCount}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -162,7 +164,7 @@ export function TableBrowser({ tables, isLoading, error }: TableBrowserProps) {
           searchQuery &&
           filteredTables.length > 0 && (
             <p className="text-xs text-muted-foreground mt-4 text-center">
-              显示 {filteredTables.length} / {tables.length} 个表
+              {t.dataSources.tables.showing} {filteredTables.length} {t.dataSources.tables.of} {tables.length} {t.dataSources.tables.tables}
             </p>
           )}
       </CardContent>

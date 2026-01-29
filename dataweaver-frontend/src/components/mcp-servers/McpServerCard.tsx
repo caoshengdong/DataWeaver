@@ -49,7 +49,7 @@ export function McpServerCard({
   const toolCount = server.toolIds?.length || server.tools?.length || 0
 
   return (
-    <Card className="group hover:shadow-md transition-shadow">
+    <Card className="group transition-all duration-200 hover:shadow-md hover:border-primary/30">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
@@ -78,8 +78,8 @@ export function McpServerCard({
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <MoreHorizontal className="h-4 w-4" />
+              <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={t.common?.moreOptions || 'More options'}>
+                <MoreHorizontal className="h-4 w-4" aria-hidden="true" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -146,8 +146,9 @@ export function McpServerCard({
             variant="outline"
             size="sm"
             onClick={() => onCopyConfig(server)}
+            aria-label={t.mcpServers?.card?.copyConfig || 'Copy configuration'}
           >
-            <Copy className="h-4 w-4" />
+            <Copy className="h-4 w-4" aria-hidden="true" />
           </Button>
         </div>
       </CardContent>

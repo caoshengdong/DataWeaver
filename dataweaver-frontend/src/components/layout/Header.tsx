@@ -10,9 +10,11 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { useAppStore } from '@/stores/useAppStore'
+import { useI18n } from '@/i18n/I18nContext'
 import { cn } from '@/lib/utils'
 
 export function Header() {
+  const { t } = useI18n()
   const { theme, setTheme, sidebarOpen, user, logout } = useAppStore()
 
   const toggleTheme = () => {
@@ -35,29 +37,34 @@ export function Header() {
       <div className="flex items-center gap-2">
         <LanguageSwitcher />
 
-        <Button variant="ghost" size="icon" onClick={toggleTheme}>
-          {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleTheme}
+          aria-label={theme === 'dark' ? t.common.switchToLightMode : t.common.switchToDarkMode}
+        >
+          {theme === 'dark' ? <Sun size={20} aria-hidden="true" /> : <Moon size={20} aria-hidden="true" />}
         </Button>
 
-        <Button variant="ghost" size="icon">
-          <Bell size={20} />
+        <Button variant="ghost" size="icon" aria-label={t.common.notifications}>
+          <Bell size={20} aria-hidden="true" />
         </Button>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <User size={20} />
+            <Button variant="ghost" size="icon" aria-label={t.common.userMenu}>
+              <User size={20} aria-hidden="true" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>
-              {user?.name || 'Guest'}
+              {user?.name || t.common.guest}
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Settings</DropdownMenuItem>
+            <DropdownMenuItem>{t.common.profile}</DropdownMenuItem>
+            <DropdownMenuItem>{t.nav.settings}</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
+            <DropdownMenuItem onClick={logout}>{t.common.logout}</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

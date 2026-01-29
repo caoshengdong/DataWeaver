@@ -22,20 +22,34 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
+import { useI18n } from '@/i18n/I18nContext'
 import type { DataSource, DataSourceFormData, DataSourceType } from '@/types'
 
-const formSchema = z.object({
-  name: z.string().min(1, '请输入数据源名称'),
-  type: z.enum(['mysql', 'postgresql', 'sqlserver', 'oracle'], '请选择数据库类型'),
-  host: z.string().min(1, '请输入主机地址'),
-  port: z.number().int().min(1, '端口必须大于0').max(65535, '端口必须小于65536'),
-  database: z.string().min(1, '请输入数据库名'),
-  username: z.string().min(1, '请输入用户名'),
-  password: z.string().min(1, '请输入密码'),
+// Base schema for type inference
+const baseFormSchema = z.object({
+  name: z.string().min(1),
+  type: z.enum(['mysql', 'postgresql', 'sqlserver', 'oracle']),
+  host: z.string().min(1),
+  port: z.number().int().min(1).max(65535),
+  database: z.string().min(1),
+  username: z.string().min(1),
+  password: z.string(),
   description: z.string().optional(),
 })
 
-type FormValues = z.infer<typeof formSchema>
+type FormValues = z.infer<typeof baseFormSchema>
+
+// Schema with translations for validation messages
+const createFormSchema = (t: ReturnType<typeof useI18n>['t']) => z.object({
+  name: z.string().min(1, t.dataSources.form.name),
+  type: z.enum(['mysql', 'postgresql', 'sqlserver', 'oracle']),
+  host: z.string().min(1, t.dataSources.form.host),
+  port: z.number().int().min(1).max(65535),
+  database: z.string().min(1, t.dataSources.form.database),
+  username: z.string().min(1, t.dataSources.form.username),
+  password: z.string(),
+  description: z.string().optional(),
+})
 
 interface DataSourceFormProps {
   dataSource?: DataSource
@@ -61,8 +75,10 @@ export function DataSourceForm({
   isSubmitting = false,
   isTesting = false,
 }: DataSourceFormProps) {
+  const { t } = useI18n()
   const [showPassword, setShowPassword] = useState(false)
 
+  const formSchema = createFormSchema(t)
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: dataSource
@@ -90,7 +106,7 @@ export function DataSourceForm({
 
   // Update port when database type changes
   useEffect(() => {
-    const subscription = form.watch((value, { name }) => {
+    const subscription = form.watch((value: Partial<FormValues>, { name }: { name?: string }) => {
       if (name === 'type' && value.type) {
         const currentPort = form.getValues('port')
         const defaultPort = DEFAULT_PORTS[value.type as DataSourceType]
@@ -113,9 +129,9 @@ export function DataSourceForm({
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>名称</FormLabel>
+              <FormLabel>{t.dataSources.form.name}</FormLabel>
               <FormControl>
-                <Input placeholder="Production Database" {...field} />
+                <Input placeholder={t.dataSources.form.namePlaceholder} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -128,11 +144,11 @@ export function DataSourceForm({
           name="type"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>数据库类型</FormLabel>
+              <FormLabel>{t.dataSources.form.type}</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="选择数据库类型" />
+                    <SelectValue placeholder={t.dataSources.form.typePlaceholder} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -154,9 +170,9 @@ export function DataSourceForm({
             name="host"
             render={({ field }) => (
               <FormItem className="col-span-2">
-                <FormLabel>主机地址</FormLabel>
+                <FormLabel>{t.dataSources.form.host}</FormLabel>
                 <FormControl>
-                  <Input placeholder="localhost" {...field} />
+                  <Input placeholder={t.dataSources.form.hostPlaceholder} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -168,7 +184,7 @@ export function DataSourceForm({
             name="port"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>端口</FormLabel>
+                <FormLabel>{t.dataSources.form.port}</FormLabel>
                 <FormControl>
                   <Input
                     type="number"
@@ -193,9 +209,9 @@ export function DataSourceForm({
           name="database"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>数据库名</FormLabel>
+              <FormLabel>{t.dataSources.form.database}</FormLabel>
               <FormControl>
-                <Input placeholder="mydb" {...field} />
+                <Input placeholder={t.dataSources.form.databasePlaceholder} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -208,9 +224,9 @@ export function DataSourceForm({
           name="username"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>用户名</FormLabel>
+              <FormLabel>{t.dataSources.form.username}</FormLabel>
               <FormControl>
-                <Input placeholder="postgres" {...field} />
+                <Input placeholder={t.dataSources.form.usernamePlaceholder} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -223,12 +239,12 @@ export function DataSourceForm({
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>密码</FormLabel>
+              <FormLabel>{t.dataSources.form.password}</FormLabel>
               <FormControl>
                 <div className="relative">
                   <Input
                     type={showPassword ? 'text' : 'password'}
-                    placeholder={dataSource ? '留空以保持不变' : '••••••••'}
+                    placeholder={dataSource ? t.dataSources.form.passwordKeepHint : t.dataSources.form.passwordPlaceholder}
                     {...field}
                   />
                   <Button
@@ -237,17 +253,18 @@ export function DataSourceForm({
                     size="sm"
                     className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                     onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? t.common.hidePassword : t.common.showPassword}
                   >
                     {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
+                      <EyeOff className="h-4 w-4" aria-hidden="true" />
                     ) : (
-                      <Eye className="h-4 w-4" />
+                      <Eye className="h-4 w-4" aria-hidden="true" />
                     )}
                   </Button>
                 </div>
               </FormControl>
               {dataSource && (
-                <FormDescription>留空以保持密码不变</FormDescription>
+                <FormDescription>{t.dataSources.form.passwordKeepHint}</FormDescription>
               )}
               <FormMessage />
             </FormItem>
@@ -260,10 +277,10 @@ export function DataSourceForm({
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>描述（可选）</FormLabel>
+              <FormLabel>{t.dataSources.form.descriptionOptional}</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="关于此数据源的描述..."
+                  placeholder={t.dataSources.form.descriptionPlaceholder}
                   className="resize-none"
                   rows={3}
                   {...field}
@@ -285,7 +302,7 @@ export function DataSourceForm({
                 disabled={isTesting || isSubmitting}
               >
                 {isTesting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                测试连接
+                {t.dataSources.form.testConnection}
               </Button>
             )}
           </div>
@@ -296,11 +313,11 @@ export function DataSourceForm({
               onClick={onCancel}
               disabled={isSubmitting}
             >
-              取消
+              {t.common.cancel}
             </Button>
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {dataSource ? '更新' : '创建'}
+              {dataSource ? t.common.update : t.common.create}
             </Button>
           </div>
         </div>
