@@ -73,7 +73,7 @@ export function ChatWidget() {
   }
 
   return (
-    <div className="fixed bottom-8 right-8 z-50">
+    <div className="fixed bottom-24 right-8 z-50">
       {/* Chat Panel */}
       <div
         ref={panelRef}
@@ -82,7 +82,7 @@ export function ChatWidget() {
           height: widgetSize.height,
         }}
         className={cn(
-          'absolute bottom-20 right-0 rounded-xl border bg-background shadow-2xl',
+          'absolute bottom-16 right-0 rounded-xl border bg-background shadow-2xl',
           'origin-bottom-right',
           isResizing ? '' : 'transition-all duration-300',
           isWidgetOpen
