@@ -8,7 +8,6 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import type { McpConfigExport, McpServer } from '@/types'
 import { useGetMcpConfigExport } from '@/hooks/useMcpServers'
@@ -59,8 +58,8 @@ export function ConfigCopyDialog({ open, onOpenChange, server }: ConfigCopyDialo
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
+      <DialogContent className="!max-w-4xl w-[90vw] max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle className="flex items-center gap-2">
             <FileJson className="h-5 w-5" />
             {t.mcpServers?.configCopy?.title || 'MCP Configuration'}
@@ -70,9 +69,9 @@ export function ConfigCopyDialog({ open, onOpenChange, server }: ConfigCopyDialo
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-4 overflow-hidden flex-1 flex flex-col min-h-0">
           {/* Usage Instructions */}
-          <Alert>
+          <Alert className="flex-shrink-0">
             <AlertDescription>
               <div className="space-y-2 text-sm">
                 <p className="font-medium">
@@ -80,7 +79,7 @@ export function ConfigCopyDialog({ open, onOpenChange, server }: ConfigCopyDialo
                 </p>
                 <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
                   <li>{t.mcpServers?.configCopy?.step1 || 'Copy the configuration below'}</li>
-                  <li>{t.mcpServers?.configCopy?.step2 || 'Add it to your MCP client configuration file (e.g., claude_desktop_config.json)'}</li>
+                  <li className="break-words">{t.mcpServers?.configCopy?.step2 || 'Add it to your MCP client configuration file (e.g., claude_desktop_config.json)'}</li>
                   <li>{t.mcpServers?.configCopy?.step3 || 'Restart your MCP client to apply changes'}</li>
                 </ol>
               </div>
@@ -88,7 +87,7 @@ export function ConfigCopyDialog({ open, onOpenChange, server }: ConfigCopyDialo
           </Alert>
 
           {/* Config Display */}
-          <div className="relative">
+          <div className="relative flex-1 min-h-0 flex flex-col">
             <div className="absolute right-2 top-2 z-10">
               <Button
                 variant="outline"
@@ -109,13 +108,13 @@ export function ConfigCopyDialog({ open, onOpenChange, server }: ConfigCopyDialo
                 )}
               </Button>
             </div>
-            <ScrollArea className="h-[300px] border rounded-lg bg-muted/30">
+            <div className="flex-1 min-h-[300px] max-h-[400px] border rounded-lg bg-muted/30 overflow-auto">
               {getConfigExport.isPending ? (
                 <div className="flex items-center justify-center h-full">
                   <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                 </div>
               ) : config ? (
-                <pre className="p-4 text-sm font-mono whitespace-pre-wrap">
+                <pre className="p-4 text-sm font-mono whitespace-pre">
                   <code>{configJson}</code>
                 </pre>
               ) : (
@@ -123,18 +122,18 @@ export function ConfigCopyDialog({ open, onOpenChange, server }: ConfigCopyDialo
                   {t.mcpServers?.configCopy?.loadFailed || 'Failed to load configuration'}
                 </div>
               )}
-            </ScrollArea>
+            </div>
           </div>
 
           {/* Server Info */}
           {server && (
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-muted-foreground flex-shrink-0">
               <p>
                 <span className="font-medium">{t.mcpServers?.configCopy?.serverName || 'Server'}:</span>{' '}
                 {server.name} (v{server.version})
               </p>
               {server.endpoint && (
-                <p>
+                <p className="break-all">
                   <span className="font-medium">{t.mcpServers?.configCopy?.endpoint || 'Endpoint'}:</span>{' '}
                   <code className="bg-muted px-1 rounded">{server.endpoint}</code>
                 </p>

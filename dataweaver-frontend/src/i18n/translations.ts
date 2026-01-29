@@ -717,6 +717,13 @@ export const translations = {
       errorMessage: 'Sorry, an error occurred. Please try again.',
       thinking: 'Thinking',
       thinkingInProgress: 'Thinking...',
+      selectServer: 'Connect MCP',
+      tools: 'tools',
+      disconnect: 'Disconnect',
+      toolArguments: 'Arguments',
+      toolResult: 'Result',
+      toolError: 'Error',
+      toolExecuting: 'Executing tool...',
     },
 
     // Error Pages
@@ -1454,6 +1461,13 @@ export const translations = {
       errorMessage: '抱歉，发生了错误。请重试。',
       thinking: '思考过程',
       thinkingInProgress: '思考中...',
+      selectServer: '连接 MCP',
+      tools: '个工具',
+      disconnect: '断开连接',
+      toolArguments: '参数',
+      toolResult: '结果',
+      toolError: '错误',
+      toolExecuting: '执行工具中...',
     },
 
     // Error Pages
