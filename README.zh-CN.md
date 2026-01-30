@@ -165,7 +165,7 @@ VITE_API_BASE_URL=http://localhost:8080/api
 | 阿里云 | 通义千问 3-Max, 通义千问 2.5-Plus, 通义千问 2.5-Turbo |
 | 智谱 AI | GLM-5, GLM-4-Plus, GLM-4-Air |
 | Moonshot | Kimi k2, Kimi k1.5 |
-| Minimax | abab7, abab6.5s |
+| MiniMax | MiniMax-M2.1, MiniMax-M2 |
 | 百川智能 | Baichuan 4, Baichuan 3 Turbo |
 | 零一万物 | Yi-Lightning, Yi-Large |
 
