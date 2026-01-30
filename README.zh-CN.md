@@ -157,15 +157,17 @@ VITE_API_BASE_URL=http://localhost:8080/api
 
 | 服务商 | 模型 |
 |--------|------|
-| OpenAI | GPT-4, GPT-4 Turbo |
-| Anthropic | Claude 3 Opus, Sonnet, Haiku |
-| Google | Gemini Pro, Ultra |
-| 深度求索 | DeepSeek Chat |
-| 阿里云 | 通义千问 Turbo, Max |
-| 智谱 AI | GLM-4, GLM-3 Turbo |
-| Moonshot | Moonshot v1 (Kimi) |
-| 百川智能 | Baichuan2-Turbo |
-| 零一万物 | Yi-Large, Yi-Medium |
+| OpenAI | GPT-5, GPT-5 Mini, GPT-4o, o3, o3-mini |
+| Anthropic | Claude 4 Opus, Claude 4 Sonnet, Claude 3.7 Sonnet, Claude 3.5 Haiku |
+| Google | Gemini 2.0 Ultra, Gemini 2.0 Pro, Gemini 2.0 Flash |
+| Azure OpenAI | GPT-5, GPT-4o, GPT-4 Turbo |
+| 深度求索 | DeepSeek-V3, DeepSeek-R1 |
+| 阿里云 | 通义千问 3-Max, 通义千问 2.5-Plus, 通义千问 2.5-Turbo |
+| 智谱 AI | GLM-5, GLM-4-Plus, GLM-4-Air |
+| Moonshot | Kimi k2, Kimi k1.5 |
+| Minimax | abab7, abab6.5s |
+| 百川智能 | Baichuan 4, Baichuan 3 Turbo |
+| 零一万物 | Yi-Lightning, Yi-Large |
 
 ## 开源协议
 

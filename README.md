@@ -157,15 +157,17 @@ VITE_API_BASE_URL=http://localhost:8080/api
 
 | Provider | Models |
 |----------|--------|
-| OpenAI | GPT-4, GPT-4 Turbo |
-| Anthropic | Claude 3 Opus, Sonnet, Haiku |
-| Google | Gemini Pro, Ultra |
-| DeepSeek | DeepSeek Chat |
-| Alibaba | Qwen Turbo, Max |
-| Zhipu AI | GLM-4, GLM-3 Turbo |
-| Moonshot | Moonshot v1 |
-| Baichuan | Baichuan2-Turbo |
-| 01.AI | Yi-Large, Yi-Medium |
+| OpenAI | GPT-5, GPT-5 Mini, GPT-4o, o3, o3-mini |
+| Anthropic | Claude 4 Opus, Claude 4 Sonnet, Claude 3.7 Sonnet, Claude 3.5 Haiku |
+| Google | Gemini 2.0 Ultra, Gemini 2.0 Pro, Gemini 2.0 Flash |
+| Azure OpenAI | GPT-5, GPT-4o, GPT-4 Turbo |
+| DeepSeek | DeepSeek-V3, DeepSeek-R1 |
+| Alibaba | Qwen 3-Max, Qwen 2.5-Plus, Qwen 2.5-Turbo |
+| Zhipu AI | GLM-5, GLM-4-Plus, GLM-4-Air |
+| Moonshot | Kimi k2, Kimi k1.5 |
+| Minimax | abab7, abab6.5s |
+| Baichuan | Baichuan 4, Baichuan 3 Turbo |
+| 01.AI | Yi-Lightning, Yi-Large |
 
 ## License
 
