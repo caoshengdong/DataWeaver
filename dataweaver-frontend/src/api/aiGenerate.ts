@@ -107,21 +107,30 @@ function buildRequestBody(prompt: string, config: AIGenerateConfig): string {
   })
 }
 
+// Remove thinking chain tags (<think>...</think>) from AI response
+function removeThinkingTags(content: string): string {
+  // Remove complete <think>...</think> blocks (including multiline)
+  return content.replace(/<think>[\s\S]*?<\/think>/g, '').trim()
+}
+
 function parseResponse(data: unknown, provider: LLMProviderType): string {
+  let content = ''
+
   if (provider === 'anthropic') {
     const response = data as AnthropicResponse
     const textContent = response.content?.find(c => c.type === 'text')
-    return textContent?.text || ''
-  }
-
-  if (provider === 'google') {
+    content = textContent?.text || ''
+  } else if (provider === 'google') {
     const response = data as GoogleResponse
-    return response.candidates?.[0]?.content?.parts?.[0]?.text || ''
+    content = response.candidates?.[0]?.content?.parts?.[0]?.text || ''
+  } else {
+    // OpenAI and compatible providers
+    const response = data as OpenAIResponse
+    content = response.choices?.[0]?.message?.content || ''
   }
 
-  // OpenAI and compatible providers
-  const response = data as OpenAIResponse
-  return response.choices?.[0]?.message?.content || ''
+  // Remove thinking chain tags from the response
+  return removeThinkingTags(content)
 }
 
 export async function generateWithAI(
